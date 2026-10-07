@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>大發家 - 杜拜巧克力布朗尼計算機</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-cream: #FCFBF7;
+            --panel-card: #FFFFFF;
+            --pistachio-primary: #709A60;
+            --pistachio-dark: #4A6B3E;
+            --pistachio-light: #F1F6EF;
+            --pistachio-border: #C3D8BB;
+            --text-dark: #1F1E1D;
+            --text-muted: #6E6A66;
+            --border-soft: #E8E4DF;
+        }
+
+        body {
+            font-family: 'Noto Sans TC', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* Input Number Arrows Removal */
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .custom-input {
+            background-color: #FFFFFF;
+            border: 2px solid var(--border-soft);
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+
+        .custom-input:focus {
+            border-color: var(--pistachio-primary);
+            box-shadow: 0 0 0 3px rgba(112, 154, 96, 0.18);
+            outline: none;
+        }
+
+        .tab-btn {
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            color: var(--text-muted);
+            background-color: #F4F1EC;
+            border-bottom: 3px solid transparent;
+        }
+
+        .tab-btn.active {
+            color: var(--pistachio-dark);
+            background-color: #FFFFFF;
+            border-bottom-color: var(--pistachio-primary);
+            font-weight: 800;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.02);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        /* Toast notification */
+        #toast {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-3 sm:p-6 md:p-8">
+
+    <div class="w-full max-w-xl mx-auto bg-white rounded-3xl border border-[#E8E4DF] shadow-sm overflow-hidden my-auto">
+        
+        <!-- Header Section -->
+        <div class="px-6 pt-8 pb-6 text-center bg-white border-b border-[#F0ECE7]">
+            <h1 class="text-4xl font-black tracking-tight text-[#1F1E1D] mb-1">
+                大發家
+            </h1>
+            <h2 class="text-lg font-bold text-[#709A60] tracking-wide mt-1">
+                杜拜巧克力布朗尼計算機
+            </h2>
+            <div class="inline-block mt-2 px-3 py-0.5 rounded-full bg-[#F1F6EF] border border-[#C3D8BB] text-xs font-semibold text-[#4A6B3E]">
+                醬 70 : 脆脆 30
+            </div>
+        </div>
+
+        <!-- 3 Distinct Tab Panels -->
+        <div class="grid grid-cols-3 bg-[#F4F1EC] border-b border-[#E8E4DF] text-center text-xs sm:text-sm font-bold">
+            <button id="tabBtn1" onclick="switchTab(1)" class="tab-btn active py-3.5 px-2 flex items-center justify-center">
+                布朗尼配方
+            </button>
+            <button id="tabBtn2" onclick="switchTab(2)" class="tab-btn py-3.5 px-2 flex items-center justify-center">
+                脆脆醬按份數
+            </button>
+            <button id="tabBtn3" onclick="switchTab(3)" class="tab-btn py-3.5 px-2 flex items-center justify-center">
+                按現有醬計算
+            </button>
+        </div>
+
+        <!-- Main Content Area -->
+        <div class="p-5 sm:p-7 space-y-6">
+
+            <!-- PAGE 1: 布朗尼配方 -->
+            <div id="tab1" class="tab-content active space-y-5">
+                <div class="bg-[#F1F6EF] p-4 sm:p-5 rounded-2xl border border-[#C3D8BB]/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="browniePortions" class="text-xs font-bold text-[#4A6B3E] uppercase tracking-wider">
+                            預計製作布朗尼份數
+                        </label>
+                        <span class="text-xs text-[#709A60] font-medium">每份基準 45g</span>
+                    </div>
+                    <div class="relative">
+                        <input type="number" id="browniePortions" value="10" min="1" oninput="calcBrownieRecipe()"
+                            class="custom-input w-full px-4 py-3 text-2xl font-extrabold rounded-xl text-left">
+                        <span class="absolute right-4 top-3.5 text-base font-bold text-stone-500">份</span>
+                    </div>
+                    <div class="text-xs text-stone-600 pt-1 flex justify-between font-medium">
+                        <span>預計布朗尼麵糊總重：</span>
+                        <span id="brownieTotalWeight" class="font-bold text-[#1F1E1D]">450 g</span>
+                    </div>
+                </div>
+
+                <!-- Recipe Ingredients Table -->
+                <div class="space-y-2.5">
+                    <div class="flex justify-between items-center px-1">
+                        <h3 class="text-xs font-bold text-stone-500 uppercase tracking-wider">基礎材料清單 (8 項)</h3>
+                        <button onclick="copyRecipeList()" class="text-xs font-bold text-[#709A60] hover:text-[#4A6B3E] bg-[#F1F6EF] border border-[#C3D8BB] px-3 py-1.5 rounded-lg flex items-center gap-1 transition">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
+                            複製配方清單
+                        </button>
+                    </div>
+
+                    <div class="grid grid-cols-1 gap-2 text-sm">
+                        
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <span class="font-semibold text-stone-800">苦甜調溫巧克力</span>
+                            <span id="ingChocolate" class="font-bold text-[#1F1E1D] text-base">150.0 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <div>
+                                <span class="font-semibold text-stone-800">無鹽奶油</span>
+                                <span id="ingButterNote" class="text-xs text-stone-500 block sm:inline sm:ml-1">(約 67~68g)</span>
+                            </div>
+                            <span id="ingButter" class="font-bold text-[#1F1E1D] text-base">67.5 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <div>
+                                <span class="font-semibold text-stone-800">全蛋</span>
+                                <span id="ingEggNote" class="text-xs text-stone-500 block sm:inline sm:ml-1">(約 86~87g，1.5顆大蛋)</span>
+                            </div>
+                            <span id="ingEgg" class="font-bold text-[#1F1E1D] text-base">86.5 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <span class="font-semibold text-stone-800">黃糖 / 二砂</span>
+                            <span id="ingSugar" class="font-bold text-[#1F1E1D] text-base">75.0 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <div>
+                                <span class="font-semibold text-stone-800">麵粉</span>
+                                <span id="ingFlourNote" class="text-xs text-stone-500 block sm:inline sm:ml-1">(約 22~23g)</span>
+                            </div>
+                            <span id="ingFlour" class="font-bold text-[#1F1E1D] text-base">22.5 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <span class="font-semibold text-stone-800">可可粉</span>
+                            <span id="ingCocoa" class="font-bold text-[#1F1E1D] text-base">20.0 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <span class="font-semibold text-stone-800">香草精</span>
+                            <span id="ingVanilla" class="font-bold text-[#1F1E1D] text-base">3.5 g</span>
+                        </div>
+
+                        <div class="flex justify-between items-center p-3.5 bg-[#FCFBF7] rounded-xl border border-[#E8E4DF]">
+                            <span class="font-semibold text-stone-800">鹽</span>
+                            <span id="ingSalt" class="font-bold text-[#1F1E1D] text-base">1.0 g</span>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 2: 脆脆醬按份數 -->
+            <div id="tab2" class="tab-content space-y-5">
+                <div class="bg-[#F1F6EF] p-4 sm:p-5 rounded-2xl border border-[#C3D8BB]/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="saucePortions" class="text-xs font-bold text-[#4A6B3E] uppercase tracking-wider">
+                            預計製作布朗尼份數
+                        </label>
+                        <span class="text-xs text-[#709A60] font-medium">每份需要 20g 脆脆醬</span>
+                    </div>
+                    <div class="relative">
+                        <input type="number" id="saucePortions" value="10" min="1" oninput="calcSauceByPortion()"
+                            class="custom-input w-full px-4 py-3 text-2xl font-extrabold rounded-xl text-left">
+                        <span class="absolute right-4 top-3.5 text-base font-bold text-stone-500">份</span>
+                    </div>
+                </div>
+
+                <!-- Calculation Results Panel -->
+                <div class="bg-[#FCFBF7] p-4 sm:p-5 rounded-2xl border border-[#E8E4DF] space-y-3.5">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-stone-700 font-medium">需要現有開心果脆脆醬</span>
+                        <span id="t2BaseSauce" class="font-bold text-[#1F1E1D] text-base">166.3 g</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-stone-700 font-medium">需要額外增加脆脆 (卡達伊夫)</span>
+                        <span id="t2ExtraCrisp" class="font-bold text-[#709A60] text-lg">33.7 g</span>
+                    </div>
+                    <div class="h-px bg-[#E8E4DF]"></div>
+                    <div class="flex justify-between items-center text-sm pt-0.5">
+                        <span class="font-bold text-stone-900">混合後總脆脆醬重量</span>
+                        <span id="t2TotalSauce" class="font-extrabold text-[#1F1E1D] text-xl">200.0 g</span>
+                    </div>
+                </div>
+
+                <!-- Golden Ratio Verification Card -->
+                <div class="p-4.5 rounded-2xl bg-white border border-[#C3D8BB] space-y-2 text-xs">
+                    <div class="font-bold text-[#4A6B3E] flex items-center gap-1.5 text-sm">
+                        <svg class="w-4 h-4 text-[#709A60]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        黃金比例驗證
+                    </div>
+                    <div class="text-stone-700 leading-relaxed space-y-1.5 pl-1.5">
+                        <p class="font-bold text-[#4A6B3E]">• 目標黃金比例：70% 醬體 : 30% 脆脆 (補加克數 = 現有醬重 × 20.29%)</p>
+                        <p>• 每 100g 現有醬含：84.2g 純醬 + 15.8g 原脆脆</p>
+                        <p>• 補加 20.29g 脆脆後：純醬 84.2g (70%) + 總脆脆 36.1g (30%)</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PAGE 3: 按現有醬計算 -->
+            <div id="tab3" class="tab-content space-y-5">
+                <div class="bg-[#F1F6EF] p-4 sm:p-5 rounded-2xl border border-[#C3D8BB]/80 space-y-2">
+                    <div class="flex justify-between items-center">
+                        <label for="existingSauceWeight" class="text-xs font-bold text-[#4A6B3E] uppercase tracking-wider">
+                            現有開心果脆脆醬重量 (g)
+                        </label>
+                        <span class="text-xs text-[#709A60] font-medium">含原本 15.8% 脆脆</span>
+                    </div>
+                    <div class="relative">
+                        <input type="number" id="existingSauceWeight" value="270.1" step="0.1" min="0" oninput="calcSauceByWeight()"
+                            class="custom-input w-full px-4 py-3 text-2xl font-extrabold rounded-xl text-left">
+                        <span class="absolute right-4 top-3.5 text-base font-bold text-stone-500">g</span>
+                    </div>
+                </div>
+
+                <!-- Calculation Results Panel -->
+                <div class="bg-[#FCFBF7] p-4 sm:p-5 rounded-2xl border border-[#E8E4DF] space-y-3.5">
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-stone-700 font-medium">額外需要加上脆脆重量 (克)</span>
+                        <span id="t3ExtraCrisp" class="font-bold text-[#709A60] text-xl">54.8 g</span>
+                    </div>
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-stone-700 font-medium">調整後總醬重 (克)</span>
+                        <span id="t3TotalSauce" class="font-bold text-[#1F1E1D] text-base">324.9 g</span>
+                    </div>
+                    <div class="h-px bg-[#E8E4DF]"></div>
+                    <div class="flex justify-between items-center text-sm pt-0.5">
+                        <span class="font-bold text-stone-900">可製作布朗尼份數 (每份 20g)</span>
+                        <span id="t3PortionsPossible" class="font-extrabold text-[#4A6B3E] text-2xl">16 份</span>
+                    </div>
+                </div>
+
+                <!-- Golden Ratio Verification Card -->
+                <div class="p-4.5 rounded-2xl bg-white border border-[#C3D8BB] space-y-2 text-xs">
+                    <div class="font-bold text-[#4A6B3E] flex items-center gap-1.5 text-sm">
+                        <svg class="w-4 h-4 text-[#709A60]" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg>
+                        黃金比例驗證
+                    </div>
+                    <div class="text-stone-700 leading-relaxed space-y-1.5 pl-1.5">
+                        <p class="font-bold text-[#4A6B3E]">• 目標黃金比例：70% 醬體 : 30% 脆脆 (補加克數 = 現有醬重 × 20.29%)</p>
+                        <p>• 每 100g 現有醬含：84.2g 純醬 + 15.8g 原脆脆</p>
+                        <p>• 補加 20.29g 脆脆後：純醬 84.2g (70%) + 總脆脆 36.1g (30%)</p>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer -->
+        <div class="py-3.5 px-6 bg-[#FCFBF7] border-t border-[#E8E4DF] text-center text-xs text-stone-400 font-medium">
+            大發家 Da Fa Jia © 杜拜巧克力布朗尼專用計算工具
+        </div>
+
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-stone-900 text-white text-xs font-bold px-4 py-2.5 rounded-full shadow-lg opacity-0 pointer-events-none transform translate-y-2 z-50">
+        配方清單已複製到剪貼簿！
+    </div>
+
+    <script>
+        // Tab Switcher Logic
+        function switchTab(tabIndex) {
+            for (let i = 1; i <= 3; i++) {
+                const btn = document.getElementById(`tabBtn${i}`);
+                const panel = document.getElementById(`tab${i}`);
+                
+                if (i === tabIndex) {
+                    btn.classList.add('active');
+                    panel.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                    panel.classList.remove('active');
+                }
+            }
+        }
+
+        // Tab 1 Logic: Brownie Base Recipe Calculation (Base = 10 portions / 450g)
+        function calcBrownieRecipe() {
+            const portionsInput = document.getElementById('browniePortions');
+            const portions = parseFloat(portionsInput.value) || 0;
+            const factor = portions / 10;
+
+            // Total weight
+            document.getElementById('brownieTotalWeight').innerText = (portions * 45).toFixed(0) + ' g';
+
+            // Ingredient calculations
+            const chocolate = 150 * factor;
+            const butter = 67.5 * factor;
+            const egg = 86.5 * factor;
+            const sugar = 75 * factor;
+            const flour = 22.5 * factor;
+            const cocoa = 20 * factor;
+            const vanilla = 3.5 * factor;
+            const salt = 1.0 * factor;
+
+            document.getElementById('ingChocolate').innerText = chocolate.toFixed(1) + ' g';
+            document.getElementById('ingButter').innerText = butter.toFixed(1) + ' g';
+            document.getElementById('ingButterNote').innerText = `(約 ${Math.round(butter - 0.5)}~${Math.round(butter + 0.5)}g)`;
+            
+            document.getElementById('ingEgg').innerText = egg.toFixed(1) + ' g';
+            const eggCount = (egg / 55).toFixed(1);
+            document.getElementById('ingEggNote').innerText = `(約 ${Math.round(egg - 0.5)}~${Math.round(egg + 0.5)}g，${eggCount}顆大蛋)`;
+
+            document.getElementById('ingSugar').innerText = sugar.toFixed(1) + ' g';
+            
+            document.getElementById('ingFlour').innerText = flour.toFixed(1) + ' g';
+            document.getElementById('ingFlourNote').innerText = `(約 ${Math.round(flour - 0.5)}~${Math.round(flour + 0.5)}g)`;
+
+            document.getElementById('ingCocoa').innerText = cocoa.toFixed(1) + ' g';
+            document.getElementById('ingVanilla').innerText = vanilla.toFixed(1) + ' g';
+            document.getElementById('ingSalt').innerText = salt.toFixed(1) + ' g';
+        }
+
+        // Copy Recipe Text
+        function copyRecipeList() {
+            const portions = document.getElementById('browniePortions').value || '10';
+            const totalW = document.getElementById('brownieTotalWeight').innerText;
+            const choc = document.getElementById('ingChocolate').innerText;
+            const butter = document.getElementById('ingButter').innerText;
+            const egg = document.getElementById('ingEgg').innerText;
+            const sugar = document.getElementById('ingSugar').innerText;
+            const flour = document.getElementById('ingFlour').innerText;
+            const cocoa = document.getElementById('ingCocoa').innerText;
+            const vanilla = document.getElementById('ingVanilla').innerText;
+            const salt = document.getElementById('ingSalt').innerText;
+
+            const textToCopy = `【大發家 杜拜巧克力布朗尼配方】
+製作份數：${portions} 份 (麵糊總重 ${totalW})
+
+• 苦甜調溫巧克力：${choc}
+• 無鹽奶油：${butter}
+• 全蛋：${egg}
+• 黃糖 / 二砂：${sugar}
+• 麵粉：${flour}
+• 可可粉：${cocoa}
+• 香草精：${vanilla}
+• 鹽：${salt}`;
+
+            // Exec command copy fallback for iFrame compatibility
+            const textarea = document.createElement('textarea');
+            textarea.value = textToCopy;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+
+            // Show Toast
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, 0)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 8px)';
+            }, 2000);
+        }
+
+        // Tab 2 Logic: Sauce by Portion
+        function calcSauceByPortion() {
+            const portions = parseFloat(document.getElementById('saucePortions').value) || 0;
+            const totalNeeded = portions * 20;
+
+            const baseSauce = totalNeeded / 1.20286;
+            const extraCrisp = baseSauce * 0.20286;
+
+            document.getElementById('t2BaseSauce').innerText = baseSauce.toFixed(1) + ' g';
+            document.getElementById('t2ExtraCrisp').innerText = extraCrisp.toFixed(1) + ' g';
+            document.getElementById('t2TotalSauce').innerText = totalNeeded.toFixed(1) + ' g';
+        }
+
+        // Tab 3 Logic: Sauce by Weight
+        function calcSauceByWeight() {
+            const existingWeight = parseFloat(document.getElementById('existingSauceWeight').value) || 0;
+            
+            const extraCrisp = existingWeight * 0.20286;
+            const totalSauce = existingWeight + extraCrisp;
+            const portionsPossible = Math.floor(totalSauce / 20);
+
+            document.getElementById('t3ExtraCrisp').innerText = extraCrisp.toFixed(1) + ' g';
+            document.getElementById('t3TotalSauce').innerText = totalSauce.toFixed(1) + ' g';
+            document.getElementById('t3PortionsPossible').innerText = portionsPossible + ' 份';
+        }
+
+        // Initial Calculations on Load
+        calcBrownieRecipe();
+        calcSauceByPortion();
+        calcSauceByWeight();
+    </script>
+</body>
+</html>
